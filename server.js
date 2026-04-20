@@ -1,15 +1,19 @@
-const express = require('express')
-const app =express()
-const PORT = 3000
-const studentRoute = require('./routes/student.route')
+const express = require("express");
+const bodyParser = require("body-parser");
+const studentRoute = require("./routes/student.route");
 
-app.use(express.json())
-app.use('/service/student', studentRoute)
+const app = express();
 
-app.get('/', (req, res) => {
-  res.send({
-    message: "server is running"
-  })
-})
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.listen(PORT, () => console.log(`SERVER RUNNING ${PORT}`))
+app.use("/students", studentRoute);
+
+app.get("/", (req, res) => {
+  res.send("Server running...");
+});
+
+const port = 3000;
+app.listen(port, () => {
+  console.log("Server jalan di port " + port);
+});

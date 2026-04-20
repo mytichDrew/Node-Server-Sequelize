@@ -1,103 +1,71 @@
-// const { req } = require('express')
-const { Student } = require('../models')
+const db = require("../models");
+const Student = db.student;
 
+exports.create = (req, res) => {
+  const studentData = {
+    name: req.body.name,
+    email: req.body.email,
+    age: req.body.age,
+  };
 
-const index = async (req, res) => {
-  const data = await Student.findAll()
-
-  if (data?.length > 0) {
-    return res.json ({
-      message: "Student fetch success",
-      data: data
+  Student.create(studentData)
+    .then(data => {
+      res.send(data);
     })
-  }
-}
+    .catch(error => {
+      res.status(500).send("Terjadi kesalahan saat menambahkan data");
+    });
+};
 
-const detail = async (req, res) => {
-  const idParams = req?.params?.id
-  const data = await Student.findByPk(idParams)
-  if(!data){
-      return res.status(404).json({
-          message: 'Student not found',
-          data: data
-      })
-  }
-  res.status(200).json({
-      message: 'Student fetch success',
-      data: data
+exports.findAll = (req, res) => {
+  Student.findAll()
+    .then(result => {
+      res.send(result);
+    })
+    .catch(error => {
+      res.status(500).send("Gagal mengambil data");
+    });
+};
+
+exports.findOne = (req, res) => {
+  const id = req.params.id;
+
+  Student.findByPk(id)
+    .then(data => {
+      if (!data) {
+        return res.send("Data tidak ditemukan");
+      }
+      res.send(data);
+    })
+    .catch(error => {
+      res.status(500).send("Terjadi kesalahan");
+    });
+};
+
+exports.update = (req, res) => {
+  const id = req.params.id;
+
+  Student.update(req.body, {
+    where: { id: id }
   })
-}
+    .then(() => {
+      res.send("Data berhasil diupdate");
+    })
+    .catch(error => {
+      res.status(500).send("Gagal update data");
+    });
+};
 
+exports.delete = (req, res) => {
+  const id = req.params.id;
 
-const store = async (req, res) => {
-  try{
-  const {name, classroom, major} = req?.body
-  const data = await Student.create({
-    name: name,
-    classroom: classroom,
-    major: major
+  Student.destroy({
+    where: { id: id }
   })
-
-    return res.json ({
-      message: "Student store success",
-      data: data
+    .then(() => {
+      res.send("Data berhasil dihapus");
     })
-  } catch (e) {
-    console.log(e)
-    res.status(500).json({
-      'message': "DB ERROR",
-      "error": e
-    })
-  }
-}
-
-const update = async (req, res) => {
-  try{
-  const idParam = req.params.id;
-  const {name, classroom, major} = req?.body
-  const data = await Student.update(
-    {
-    name: name,
-    classroom: classroom,
-    major: major
-  }, {
-    where:{
-      id:idParam
-    }
-  }) 
-  return res.json ({
-    message: "Student fetch success",
-    data: {id: idParam,name,classroom,major}
-  })
-
-}catch (e) {
-    console.log(e)
-    res.status(500).json({
-      'message': "DB ERROR",
-      "error": e
-    })
-  }
-}
-
-const destroy = async (req, res) => {
-    const idParams = req?.params?.id
-    const data = await Student.destroy({where: {id: idParams}})
-    if(data === 0){
-        return res.status(404).json({
-            message: 'Student not found',
-            data: data
-        })
-    }
-    res.status(200).json({
-        message: 'Student deleted successfully',
-        data: data
-    })
-}
-
-module.exports = {
-  index,
-  store,
-  update,
-  detail,
-  destroy
-}
+    .catch(error => {
+      res.status(500).send("Gagal menghapus data");
+    });
+};
