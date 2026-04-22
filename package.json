@@ -8,7 +8,7 @@
     "dev": "nodemon server.js"
   },
   "keywords": [],
-  "author": "dzaki",
+  "author": "Praharsya Batara Dendri",
   "license": "ISC",
   "dependencies": {
     "express": "^5.2.1",
